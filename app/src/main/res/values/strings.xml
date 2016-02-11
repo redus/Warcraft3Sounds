@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Warcraft3Sounds</string>
+    <string name="title_main">Warcraft3Sounds</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_unit">Unit</string>
+    <string name="attack">Attack</string>
+    <string name="ability">Ability</string>
+</resources>
