@@ -39,9 +39,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         unit_db.closeDatabase();
-        super.onStop();
+        super.onDestroy();
     }
 
     @Override
