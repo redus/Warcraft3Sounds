@@ -1,6 +1,7 @@
 package com.redus.warcraft3sounds;
 
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -22,6 +23,9 @@ public class MainActivity extends ActionBarActivity {
         // init database on start
         unit_db = UnitDatabase.getInstance();
         unit_db.initDatabase(getApplicationContext());
+
+        // set hardware volume key to audiostream
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         GridView gridview = (GridView) findViewById(R.id.gridview);
         final ImageAdapter imageAdapter = new ImageAdapter(this);
