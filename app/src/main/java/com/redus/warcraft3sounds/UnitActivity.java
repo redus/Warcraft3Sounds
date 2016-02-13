@@ -18,6 +18,7 @@ import android.widget.Toast;
 public class UnitActivity extends ActionBarActivity {
 
     private static final int MAX_CONCURRENT_SOUNDS = 8;
+    private static final float VOLUME_DEFAULT = 0.9f;
     private SoundPool soundPool;
     private Sound[] sounds;
 
@@ -66,7 +67,7 @@ public class UnitActivity extends ActionBarActivity {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
                 if (status == 0) {
-                    soundPool.play(sampleId, 1, 1, 1, 0, 1);
+                    soundPool.play(sampleId, VOLUME_DEFAULT, VOLUME_DEFAULT, 1, 0, 1);
                 } else {
                     Toast.makeText(getApplicationContext(), "Loading sound failed.",
                             Toast.LENGTH_SHORT).show();
