@@ -1,5 +1,6 @@
 package com.redus.warcraft3sounds;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -47,7 +48,7 @@ public class UnitActivity extends ActionBarActivity {
         soundListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                soundPool.load(getApplicationContext(), sounds[position].getSource(), 1);
+            soundPool.load(getApplicationContext(), sounds[position].getSource(), 1);
             }
         });
     }
@@ -64,10 +65,33 @@ public class UnitActivity extends ActionBarActivity {
     private void setSoundPool(){
         soundPool = new SoundPool(MAX_CONCURRENT_SOUNDS, AudioManager.STREAM_MUSIC, 0);
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+
             @Override
-            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+            public void onLoadComplete(final SoundPool soundPool, final int sampleId, int status) {
+                final AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                AudioManager.OnAudioFocusChangeListener afChangeListener =
+                        new AudioManager.OnAudioFocusChangeListener() {
+                            @Override
+                            public void onAudioFocusChange(int focusChange) {
+                                if (focusChange == AudioManager.AUDIOFOCUS_LOSS
+                                        || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                                    soundPool.stop(sampleId);
+                                    am.abandonAudioFocus(this);
+                                }
+                            }
+                        };
+
                 if (status == 0) {
-                    soundPool.play(sampleId, VOLUME_DEFAULT, VOLUME_DEFAULT, 1, 0, 1);
+                    int focus = am.requestAudioFocus(afChangeListener, AudioManager.STREAM_MUSIC,
+                            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+
+                    if (focus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+                        soundPool.play(sampleId, VOLUME_DEFAULT, VOLUME_DEFAULT, 1, 0, 1);
+                        am.abandonAudioFocus(afChangeListener);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Could not gain audio focus.",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), "Loading sound failed.",
                             Toast.LENGTH_SHORT).show();
