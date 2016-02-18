@@ -27,7 +27,7 @@ public class MainActivity extends ActionBarActivity {
         // set hardware volume key to audiostream
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        GridView gridview = (GridView) findViewById(R.id.gridview);
+        GridView gridview = (GridView) findViewById(R.id.gridView);
         final ImageAdapter imageAdapter = new ImageAdapter(this);
         gridview.setAdapter(imageAdapter);
 
