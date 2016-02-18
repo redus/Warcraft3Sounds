@@ -1,6 +1,8 @@
 package com.redus.warcraft3sounds;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -47,8 +49,16 @@ public class UnitActivity extends ActionBarActivity {
 
         soundListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-            soundPool.load(getApplicationContext(), sounds[position].getSource(), 1);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                soundPool.load(getApplicationContext(), sounds[position].getSource(), 1);
+            }
+        });
+
+        soundListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                dialogOptions(position);
+                return true;
             }
         });
     }
@@ -85,7 +95,7 @@ public class UnitActivity extends ActionBarActivity {
                     int focus = am.requestAudioFocus(afChangeListener, AudioManager.STREAM_MUSIC,
                             AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
 
-                    if (focus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+                    if (focus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                         soundPool.play(sampleId, VOLUME_DEFAULT, VOLUME_DEFAULT, 1, 0, 1);
                         am.abandonAudioFocus(afChangeListener);
                     } else {
@@ -98,6 +108,41 @@ public class UnitActivity extends ActionBarActivity {
                 }
             }
         });
+    }
+
+
+    // EFF: show dialog option when item was long clicked;
+    private void dialogOptions(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog dialog = builder.setItems(R.array.dialog_options, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // The 'which' argument contains the index position
+                // of the selected item
+                switch(which){
+                    case 0:
+                        exportSound(position);
+                        break;
+                    case 1:
+                        setContactRingtone(position);
+                        break;
+                    default:
+                        Toast.makeText(getApplicationContext(), "Invalid Option",
+                                Toast.LENGTH_LONG).show();
+                }
+            }
+        }).create();
+        dialog.show();
+    }
+
+    // EFF: export selected sound to notification sound folder (sd)
+    private void exportSound(int position) {
+
+    }
+
+    // EFF: open contact app for selecting contact, and
+    //     set the contact's ringtone to the selected sound
+    private void setContactRingtone(int position) {
+
     }
 
     @Override
@@ -127,4 +172,6 @@ public class UnitActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
