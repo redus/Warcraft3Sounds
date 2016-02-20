@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,10 +20,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class UnitActivity extends ActionBarActivity {
 
     private static final int MAX_CONCURRENT_SOUNDS = 8;
     private static final float VOLUME_DEFAULT = 0.9f;
+    private static final String TAG = "UnitActivity";
     private SoundPool soundPool;
     private Sound[] sounds;
 
@@ -114,29 +122,69 @@ public class UnitActivity extends ActionBarActivity {
     // EFF: show dialog option when item was long clicked;
     private void dialogOptions(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+
         AlertDialog dialog = builder.setItems(R.array.dialog_options, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                // The 'which' argument contains the index position
-                // of the selected item
-                switch(which){
-                    case 0:
-                        exportSound(position);
-                        break;
-                    case 1:
-                        setContactRingtone(position);
-                        break;
-                    default:
-                        Toast.makeText(getApplicationContext(), "Invalid Option",
-                                Toast.LENGTH_LONG).show();
-                }
+            Context c = getApplicationContext();
+
+            switch(which){
+                case 0:
+                    exportSound(position, c);
+                    break;
+                case 1:
+                    setContactRingtone(position);
+                    break;
+                default:
+                    Toast.makeText(c, "Invalid Option", Toast.LENGTH_LONG).show();
+            }
             }
         }).create();
         dialog.show();
     }
 
+    // REQ: file format is mp3
     // EFF: export selected sound to notification sound folder (sd)
-    private void exportSound(int position) {
+    private void exportSound(int position, Context c){
+        Log.d(TAG, "Exporting sound file to sdcard notifications folder.");
+        String format = ".mp3";
 
+        // check if mounted
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)){
+            Log.w(TAG, "Cannot write to sdcard.");
+            Toast.makeText(c, "Error writing to sdcard", Toast.LENGTH_LONG).show();
+            return;
+        } else if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            Log.w(TAG, "Sdcard unavailable.");
+            Toast.makeText(c, "Sdcard unavailable", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            int resId = sounds[position].getSource();
+            InputStream in = getResources().openRawResource(resId);
+            File path = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_NOTIFICATIONS);
+            path.mkdirs();
+
+            File file = new File(path, getResources().getResourceEntryName(resId) + format);
+            FileOutputStream out = new FileOutputStream(file);
+
+            byte[] buff = new byte[1024];
+            int read;
+            while ((read = in.read(buff)) > 0) {
+                out.write(buff, 0, read);
+            }
+            in.close();
+            out.close();
+
+            Toast.makeText(c, "Done!", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Could not export file to SD card.");
+            Toast.makeText(c, "Error exporting the file", Toast.LENGTH_LONG).show();
+        }
     }
 
     // EFF: open contact app for selecting contact, and
