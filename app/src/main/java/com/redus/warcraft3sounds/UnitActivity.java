@@ -1,5 +1,6 @@
 package com.redus.warcraft3sounds;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -28,6 +30,7 @@ import java.io.InputStream;
 public class UnitActivity extends ActionBarActivity {
 
     private static final int MAX_CONCURRENT_SOUNDS = 8;
+    private static final int REQUEST_SELECT_CONTACT = 1;
     private static final float VOLUME_DEFAULT = 0.9f;
     private static final String TAG = "UnitActivity";
     private SoundPool soundPool;
@@ -44,10 +47,10 @@ public class UnitActivity extends ActionBarActivity {
         UnitDatabase unitDatabase = UnitDatabase.getInstance();
         setTitle(unitDatabase.getName(unitId));
         //images
-        ImageButton abilityButton = (ImageButton) findViewById(R.id.abilityButton);
-        abilityButton.setImageBitmap(unitDatabase.getAbilityImage(unitId));
         ImageView unitImage = (ImageView) findViewById(R.id.unitImage);
         unitImage.setImageBitmap(unitDatabase.getUnitImage(unitId));
+        ImageButton abilityButton = (ImageButton) findViewById(R.id.abilityButton);
+        abilityButton.setImageBitmap(unitDatabase.getAbilityImage(unitId));
 
         //sounds
         parseSounds(unitDatabase.getSounds(unitId));
@@ -67,6 +70,15 @@ public class UnitActivity extends ActionBarActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 dialogOptions(position);
                 return true;
+            }
+        });
+
+        // random sound when ability button is clicked
+        abilityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = (int) (Math.random() * sounds.length);
+                soundPool.load(getApplicationContext(), sounds[position].getSource(), 1);
             }
         });
     }
@@ -190,10 +202,18 @@ public class UnitActivity extends ActionBarActivity {
     // EFF: open contact app for selecting contact, and
     //     set the contact's ringtone to the selected sound
     private void setContactRingtone(int position) {
-
+        Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(intent, REQUEST_SELECT_CONTACT);
     }
 
     @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+        }
+    }
+
+            @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_unit, menu);

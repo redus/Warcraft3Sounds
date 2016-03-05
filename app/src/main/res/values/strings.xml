@@ -6,4 +6,5 @@
     <string name="title_activity_unit">Unit</string>
     <string name="attack">Attack</string>
     <string name="ability">Ability</string>
+    <string name="unit_image">Unit Image</string>
 </resources>

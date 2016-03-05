@@ -7,24 +7,26 @@
     tools:context="com.redus.warcraft3sounds.UnitActivity">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:id="@+id/unitImage"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true"
+        android:contentDescription="@string/unit_image"/>
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:id="@+id/abilityButton"
+        android:scaleType="fitCenter"
         android:layout_toLeftOf="@+id/attackButton"
         android:layout_toStartOf="@+id/attackButton"
         android:contentDescription="@string/ability" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:id="@+id/attackButton"
         android:src="@drawable/attack"
         android:layout_alignParentTop="true"
